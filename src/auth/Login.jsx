@@ -37,7 +37,7 @@ const Login = () => {
       // Delay sedikit sebelum navigate
       setTimeout(() => {
         navigate("/dashboard");
-      }, 5000);
+      }, 100);
       
     } catch (err) {
       console.error("Login error:", err);

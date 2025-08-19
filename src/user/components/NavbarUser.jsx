@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const NavbarUser = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   
@@ -74,6 +74,14 @@ const NavbarUser = () => {
                       </Link>
                       <div className="border-t border-gray-100">
                         <button
+                          onClick={async () => {
+                           try {
+                            await logout();
+                            // redirect ke halaman login setelah logout
+                          } catch (error) {
+                            console.error("Logout gagal", error);
+                          }
+                          }}
                           className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50"
                         >
                           <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

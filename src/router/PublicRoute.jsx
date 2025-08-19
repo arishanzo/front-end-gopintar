@@ -10,9 +10,11 @@ const PublicRoute = ({ children }) => {
         </div>
     );
 
-    // Jika sudah login, redirect ke dashboard
-    if (user) return <Navigate to="/dashboard" />;
-
+   
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
     // Jika belum login, tampilkan halaman public (login/register)
     return children;
 };

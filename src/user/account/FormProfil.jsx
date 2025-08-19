@@ -139,6 +139,8 @@ const FormProfil = () => {
 
          {/* Profile Header */}
          
+    
+ <form  onSubmit={handleSubmit}>
               <div className="flex items-center space-x-6 p-8">
                 <div className="relative">
                   <img
@@ -173,10 +175,9 @@ const FormProfil = () => {
                            }
 
 
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6 p-8">
 
- <form  onSubmit={handleSubmit}>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6  p-8">
-        <div>
+        <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
                   <input 
                     type="text" 
@@ -188,7 +189,7 @@ const FormProfil = () => {
                   />
                 </div>
 
-                <div>
+             <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <input 
                     type="email" 
@@ -200,7 +201,7 @@ const FormProfil = () => {
                   />
                 </div>
 
-                <div>
+              <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">No. Telepon</label>
                   <input 
                     type="tel" 
@@ -217,7 +218,7 @@ const FormProfil = () => {
 
 
 
-                <div>
+              <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Provinsi</label>
                   <select 
                   value={provinsi}
@@ -234,7 +235,7 @@ const FormProfil = () => {
                         
                 </div>
 
-                <div>
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kabupaten/Kota</label>
                   <select 
                    value={kabupaten}
@@ -250,7 +251,7 @@ const FormProfil = () => {
                   </select>
                 </div>
 
-                <div>
+         <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kecamatan</label>
                   <select 
                      value={kecamatan}
@@ -268,7 +269,7 @@ const FormProfil = () => {
 
 
 
-                  <div>
+               <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kelurahan</label>
                   <select 
                      value={Kelurahan}
@@ -284,7 +285,7 @@ const FormProfil = () => {
                   </select>
                 </div>
 
-             <div>
+             <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kode Pos</label>
                   <input 
                     value={formData.kode_pos}
@@ -298,7 +299,7 @@ const FormProfil = () => {
 
                 </div>
 
-                 <div>
+                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nama Anak</label>
                   <input 
                     value={formData.nama_anak}
@@ -311,7 +312,7 @@ const FormProfil = () => {
 
                 </div>
               
-               <div>
+             <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Usia Anak</label>
                   <input 
                     value={formData.usia_anak}
@@ -326,7 +327,7 @@ const FormProfil = () => {
                 </div>
               
                 
-                <div className="col-span-2">
+                <div className="col-span-2 mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
                   <textarea 
                     value={formData.alamatlengkap}
@@ -359,7 +360,7 @@ const FormProfil = () => {
 
 
               </div>
-              </form>
+         </form>
          </>
     )
 }

@@ -3,9 +3,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import axiosClient from "../lib/axios";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
 
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -29,15 +31,13 @@ const Login = () => {
     try {
       // 1) ambil CSRF cookie
       await axiosClient.get("/sanctum/csrf-cookie");
-      const response = await axiosClient.post("/api/login", formData);
+      await axiosClient.post("/api/login", formData);
       
-      console.log("Login response:", response.data);
+      const userResponse = await axiosClient.get("/api/user");
+      await login(userResponse.data);
+      
       setStatus("Login berhasil.");
-      
-      // Delay sedikit sebelum navigate
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 100);
+   
       
     } catch (err) {
       console.error("Login error:", err);
@@ -61,6 +61,10 @@ const Login = () => {
         await axiosClient.post("/api/auth/google/callback", {
           token: tokenResponse.access_token,
         });
+        
+        const userResponse = await axiosClient.get("/api/user");
+        await login(userResponse.data);
+        
         navigate("/dashboard");
       } catch (err) {
         const data = err.response?.data || {};

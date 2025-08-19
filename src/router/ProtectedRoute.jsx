@@ -3,6 +3,9 @@ import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
     const { user, loading } = useAuth();
+    
+    console.log("ProtectedRoute - User:", user);
+    console.log("ProtectedRoute - Loading:", loading);
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center">
@@ -10,11 +13,13 @@ const ProtectedRoute = ({ children }) => {
         </div>
     );
 
-    // Jika belum login, redirect ke login
-    if (!user) return <Navigate to="/login" />;
+   if (!user) {
+    console.log("No user found, redirecting to login");
+    return <Navigate to="/login" replace />;
+  }
 
-    // Jika sudah login, tampilkan halaman protected
-    return children;
+  console.log("User authenticated, rendering protected content");
+  return children;
 };
 
 export default ProtectedRoute;

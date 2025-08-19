@@ -25,8 +25,18 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
+
+  const login = async (userData) => {
+    setUser(userData);
+  };
+
+   const logout = async () => {
+    await axiosClient.post("/api/logout");
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

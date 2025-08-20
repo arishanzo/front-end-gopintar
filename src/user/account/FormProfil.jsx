@@ -1,9 +1,16 @@
 import { useAuth } from "../../context/AuthContext";
-import { useState, useEffect } from "react";
+import { useEffect, useState} from "react";
 import axiosClient from "../../lib/axios";
+import { useWilayah } from "../../hook/useWilayah";
+import { UseGetProfil } from "../../hook/useGetProfil";
+import { useGetWilayah } from "../../hook/useGetWilayah";
+
 
 const FormProfil = () => {
   const { user } = useAuth();
+
+  
+
    const [preview, setPreview] = useState("https://github.com/gaearon.png");
     const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -12,36 +19,58 @@ const FormProfil = () => {
     }
   };
 
-
-// set wilayah
-   const [provinsi, setProvinsi] = useState("");
-   const [kabupaten, setKabupaten] = useState("");
-   const [kecamatan, setKecamatan] = useState("");
-   
-   const [Kelurahan, setKelurahan] = useState("");
-
-  const [listProvinsi, setListProvinsi] = useState([]);
-  const [listKabupaten, setListKabupaten] = useState([]);
-  const [listKecamatan, setListKecamatan] = useState([]);
   
-  const [listKelurahan, setListKelurahan] = useState([]);
+// set wilayah
+const {
+    provinsi, setProvinsi, listProvinsi,
+    kabupaten, setKabupaten, listKabupaten,
+    kecamatan, setKecamatan, listKecamatan,
+    kelurahan, setKelurahan, listKelurahan,
+  } = useWilayah();
+
+
+  // ambil data profil per id
+  const { profil, loading , error } = UseGetProfil(user?.iduser);
+  
+
+  const { getprovinsi, getkabupaten, getkecamatan, getkelurahan } = useGetWilayah(profil?.provinsi, profil?.kabupaten, profil?.kecamatan, profil?.kelurahan);
+
 
 
 // form
 
- const [formData, setFormData] = useState({
-    namauser: "",
-    foto_profil: "",
-    alamatlengkap: "",
-    no_telp: "",
-    kelurahanform: "",
-    kecamatanform: "",
-    kabupatenform: "",
-    provinsiform: "",
-    kode_pos: "",
-    nama_anak: "",
-    usia_anak: "",
-  });
+const [formData, setFormData] = useState({
+  namauser: "",
+  foto_profil: "",
+  alamatlengkap: "",
+  no_telp: "",
+  kelurahan: "",
+  kecamatan: "",
+  kabupaten: "",
+  provinsi: "",
+  kode_pos: "",
+  nama_anak: "",
+  usia_anak: "",
+});
+
+useEffect(() => {
+  if (profil) {
+    setFormData((prev) => ({
+      ...prev,
+      namauser: profil.namauser || "",
+      foto_profil: profil.foto_profil || "",
+      alamatlengkap: profil.alamatlengkap || "",
+      no_telp: profil.no_telp || "",
+      kelurahan: profil.kelurahan || "",
+      kecamatan: profil.kecamatan || "",
+      kabupaten: profil.kabupaten || "",
+      provinsi: profil.provinsi || "",
+      kode_pos: profil.kode_pos || "",
+      nama_anak: profil.nama_anak || "",
+      usia_anak: profil.usia_anak || "",
+    }));
+  }
+}, [profil]);
 
 
   const [errors, setErrors] = useState({});
@@ -49,20 +78,30 @@ const FormProfil = () => {
   const [disabled, setDisabled] = useState(false);
   const [textButton, setTextButton] = useState("Simpan Perubahan");
 
-  const handleChange = (e) =>
-    setFormData((s) => ({ ...s, [e.target.name]: e.target.value }));
+
+     const handleChange = (e) => {
+        setFormData({
+            ...formData, [e.target.name]: e.target.value
+        });
+    };
 
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setDisabled(true);
     setTextButton("Prosess");
     setErrors({}); // reset
 
     try {
-        
-      const response = await axiosClient.post("/api/editprofil", formData);
       
+      let response;
+
+      if (!profil) {
+      response = await axiosClient.post("/api/profile", formData);
+    }else {
+      response = await axiosClient.post(`/api/profileedit/${profil.idprofiluser}`, formData);
+    }
+
       console.log("Form response:", response.data);
       setStatus("Ubah Data berhasil.");
       
@@ -71,6 +110,7 @@ const FormProfil = () => {
       const data = err.response?.data || {};
       setErrors(data.errors || { general: [data.message || "Ubah Data gagal."] });
       setStatus("Ubah Data gagal. Silakan coba lagi.");
+      setFormData("");
     } finally {
       setDisabled(false);
       setTextButton("Simpan Perubahan");
@@ -82,58 +122,21 @@ const FormProfil = () => {
 
 
 
+
+
      // Ambil provinsi saat pertama kali render
-  useEffect(() => {
-    fetch("https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json")
-      .then((res) => res.json())
-      .then((data) => setListProvinsi(data));
-  }, []);
 
+  if (loading || !user) 
+  return  <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>;
 
-   // Ambil kabupaten ketika provinsi dipilih
-  useEffect(() => {
-    if (provinsi) {
-      fetch(
-        `https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provinsi}.json`
-      )
-        .then((res) => res.json())
-        .then((data) => setListKabupaten(data));
-    } else {
-      setListKabupaten([]);
-      setKabupaten("");
-    }
-  }, [provinsi]);
-
-    // Ambil kecamatan ketika kabupaten dipilih
-        useEffect(() => {
-            if (kabupaten) {
-            fetch(
-                `https://www.emsifa.com/api-wilayah-indonesia/api/districts/${kabupaten}.json`
-            )
-                .then((res) => res.json())
-                .then((data) => setListKecamatan(data));
-            } else {
-            setListKecamatan([]);
-            setKecamatan("");
-            }
-        }, [kabupaten]);
-
-
-         // Ambil kelurahan ketika kecamatan dipilih
-  useEffect(() => {
-    if (kecamatan) {
-      fetch(
-        `https://www.emsifa.com/api-wilayah-indonesia/api/villages/${kecamatan}.json`
-      )
-        .then((res) => res.json())
-        .then((data) => setListKelurahan(data));
-    } else {
-      setListKelurahan([]);
-      setKelurahan("");
-    }
-  }, [kecamatan]);
-        
-
+ if (error) return (
+  <p style={{ color: "red" }}>
+    {typeof error === "string" ? error : error.message || "Error"}
+  </p>
+);
+     
     return (
         <>
 
@@ -149,7 +152,13 @@ const FormProfil = () => {
                     alt="Profile"
                   />
                   <label className="absolute bottom-0 right-0 bg-green-600 text-white rounded-full p-2 hover:bg-green-700 cursor-pointer">
-                    <input type="file" accept="image/*"  onChange={handleFileChange}  className="hidden" />
+                    <input 
+                    type="file" 
+                    name="foto_profil" 
+                    accept="image/*"  
+                    onChange={handleFileChange}  
+                    value={formData.foto_profil} 
+                    className="hidden" />
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
@@ -163,6 +172,9 @@ const FormProfil = () => {
                       ✓ Verified
                     </span>
                   </div>
+
+                  
+                   {errors?.foto_profil?.[0] && <small style={{color: 'red'}}>{errors.foto_profil[0]}</small>}
                 </div>
               </div>
 
@@ -197,7 +209,6 @@ const FormProfil = () => {
                     className="w-full px-4 bg-gray-100 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" 
                     placeholder="Masukkan email"
                     readOnly
-                    defaultValue="john@example.com"
                   />
                 </div>
 
@@ -205,9 +216,10 @@ const FormProfil = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">No. Telepon</label>
                   <input 
                     type="tel" 
+                    name="no_telp"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" 
                     placeholder="Masukkan nomor telepon"
-                       value={formData.no_telp}
+                   value={formData.no_telp}
                    onChange={handleChange}
                    
                   />
@@ -221,10 +233,11 @@ const FormProfil = () => {
               <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Provinsi</label>
                   <select 
+                  name="provinsi"
                   value={provinsi}
-                  onChange={(e) => {setProvinsi(e.target.value); handleChange}}
+                  onChange={(e) => {setProvinsi(e.target.value); handleChange(e)}}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                     <option value="">Pilih Provinsi</option>
+                     <option value="">{profil?.provinsi && getprovinsi?.name ? getprovinsi.name : 'Pilih Provinsi'}</option>
                         {listProvinsi.map((prov) => (
                             <option key={prov.id} value={prov.id}>
                             {prov.name}
@@ -238,11 +251,12 @@ const FormProfil = () => {
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kabupaten/Kota</label>
                   <select 
+                   name="kabupaten"
                    value={kabupaten}
-                    onChange={(e) => {setKabupaten(e.target.value); handleChange}}
+                    onChange={(e) => {setKabupaten(e.target.value); handleChange(e)}}
                     disabled={!provinsi}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                     <option value="">Pilih Kabupaten</option>
+                     <option value="">{profil?.kabupaten && getkabupaten?.name ? getkabupaten.name : 'Pilih Kabupaten'}</option>
                     {listKabupaten.map((kab) => (
                         <option key={kab.id} value={kab.id}>
                         {kab.name}
@@ -254,11 +268,12 @@ const FormProfil = () => {
          <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kecamatan</label>
                   <select 
+                     name="kecamatan"
                      value={kecamatan}
-                    onChange={(e) => {setKecamatan(e.target.value); handleChange }}
+                    onChange={(e) => {setKecamatan(e.target.value); handleChange(e)}}
                     disabled={!kabupaten}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="">Pilih Kecamatan</option>
+                    <option value="">{profil?.kecamatan && getkecamatan?.name ? getkecamatan.name : 'Pilih Kecamatan'}</option>
                     {listKecamatan.map((kec) => (
                         <option key={kec.id} value={kec.id}>
                         {kec.name}
@@ -272,11 +287,12 @@ const FormProfil = () => {
                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kelurahan</label>
                   <select 
-                     value={Kelurahan}
-                    onChange={(e) => {setKelurahan(e.target.value); handleChange }}
-                    disabled={!kabupaten}
+                     name="kelurahan"
+                     value={kelurahan}
+                    onChange={(e) => {setKelurahan(e.target.value); handleChange(e)}}
+                    disabled={!kecamatan}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option value="">Pilih Kecamatan</option>
+                    <option value="">{profil?.kelurahan && getkelurahan?.name ? getkelurahan.name : 'Pilih Kelurahan'}</option>
                     {listKelurahan.map((kel) => (
                         <option key={kel.id} value={kel.id}>
                         {kel.name}
@@ -288,11 +304,12 @@ const FormProfil = () => {
              <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kode Pos</label>
                   <input 
+                    name="kode_pos"
                     value={formData.kode_pos}
                     onChange={handleChange}
                     type="number" 
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" 
-                    placeholder="Masukkan nomor telepon"
+                    placeholder="Masukkan kode Pos"
                   />
 
                     {errors?.kode_pos?.[0] && <small style={{color: 'red'}}>{errors.kode_pos[0]}</small>}
@@ -302,6 +319,7 @@ const FormProfil = () => {
                  <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nama Anak</label>
                   <input 
+                    name="nama_anak"
                     value={formData.nama_anak}
                     onChange={handleChange}
                     type="text" 
@@ -315,6 +333,7 @@ const FormProfil = () => {
              <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Usia Anak</label>
                   <input 
+                    name="usia_anak"
                     value={formData.usia_anak}
                     onChange={handleChange}
                     type="number" 
@@ -330,6 +349,7 @@ const FormProfil = () => {
                 <div className="col-span-2 mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
                   <textarea 
+                    name="alamatlengkap"
                     value={formData.alamatlengkap}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" 

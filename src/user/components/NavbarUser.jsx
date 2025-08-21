@@ -1,11 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { UseGetProfil } from "../../hook/useGetProfil";
+import axiosClient from "../../lib/axios";
 
 const NavbarUser = () => {
   const { user, logout } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [ photo, setPhoto] = useState('https://github.com/gaearon.png');
+
+
+
+   const { profil} = UseGetProfil(user?.iduser);
+    
+  
+  useEffect(() => {
+    if (profil?.foto_profil) {
+      axiosClient
+        .get(`/api/photos/${encodeURIComponent(profil.foto_profil)}`, { responseType: 'blob' })
+        .then(res => {
+          const url = URL.createObjectURL(res.data);
+          setPhoto(url);
+        })
+        .catch(err => console.error(err));
+    }
+  }, [profil]);
   
   const notifications = [
     { id: 1, title: "Kelas Matematika dimulai dalam 30 menit", time: "2 menit lalu", unread: true },
@@ -28,7 +48,7 @@ const NavbarUser = () => {
                 >
                   <img
                     className="h-8 w-8 rounded-full object-cover"
-                    src="https://github.com/gaearon.png"
+                    src={photo}
                     alt="Profile"
                   />
                   <div className="hidden md:block text-left">

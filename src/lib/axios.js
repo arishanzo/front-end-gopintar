@@ -7,6 +7,7 @@ const axiosClient = axios.create({
   headers: {
     "X-Requested-With": "XMLHttpRequest", // penting untuk Sanctum
     "Accept": "application/json",
+    "Content-Type": "multipart/form-data",
   },
 });
 

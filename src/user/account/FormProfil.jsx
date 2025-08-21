@@ -4,6 +4,7 @@ import axiosClient from "../../lib/axios";
 import { useWilayah } from "../../hook/useWilayah";
 import { UseGetProfil } from "../../hook/useGetProfil";
 import { useGetWilayah } from "../../hook/useGetWilayah";
+import { getFetchCache } from "../../lib/fetchCahce/getFetchCache";
 
 
 const FormProfil = () => {
@@ -12,12 +13,12 @@ const FormProfil = () => {
   
 
    const [preview, setPreview] = useState("https://github.com/gaearon.png");
-    const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setPreview(URL.createObjectURL(file)); // bikin preview dari file lokal
-    }
-  };
+  //   const handleFileChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setPreview(URL.createObjectURL(file)); // bikin preview dari file lokal
+  //   }
+  // };
 
   
 // set wilayah
@@ -35,13 +36,22 @@ const {
 
   const { getprovinsi, getkabupaten, getkecamatan, getkelurahan } = useGetWilayah(profil?.provinsi, profil?.kabupaten, profil?.kecamatan, profil?.kelurahan);
 
-
+useEffect(() => {
+  if (profil?.foto_profil) {
+       getFetchCache (() => axiosClient.get(`/api/photos/${encodeURIComponent(profil.foto_profil)}`, { responseType: 'blob' }))
+       .then(res => {
+        const url = URL.createObjectURL(res.data);
+        setPreview(url);
+      })
+      .catch(err => console.error(err));
+  }
+}, [profil]);
+  
 
 // form
 
 const [formData, setFormData] = useState({
   namauser: "",
-  foto_profil: "",
   alamatlengkap: "",
   no_telp: "",
   kelurahan: "",
@@ -53,12 +63,13 @@ const [formData, setFormData] = useState({
   usia_anak: "",
 });
 
+const [newPhoto, setNewPhoto] = useState(null);
+
 useEffect(() => {
   if (profil) {
     setFormData((prev) => ({
       ...prev,
       namauser: profil.namauser || "",
-      foto_profil: profil.foto_profil || "",
       alamatlengkap: profil.alamatlengkap || "",
       no_telp: profil.no_telp || "",
       kelurahan: profil.kelurahan || "",
@@ -79,7 +90,16 @@ useEffect(() => {
   const [textButton, setTextButton] = useState("Simpan Perubahan");
 
 
-     const handleChange = (e) => {
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setPreview(URL.createObjectURL(file));
+            setNewPhoto(file);
+        }
+    };
+
+    const handleChange = (e) => {
+     
         setFormData({
             ...formData, [e.target.name]: e.target.value
         });
@@ -88,22 +108,29 @@ useEffect(() => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const dataForm = new FormData();
+    Object.entries(formData).forEach(([key, val]) => {
+      dataForm.append(key, val);
+    });
+    
+    if (newPhoto) {
+      dataForm.append('foto_profil', newPhoto);
+    }
+  
     setDisabled(true);
     setTextButton("Prosess");
     setErrors({}); // reset
 
     try {
       
-      let response;
-
-      if (!profil) {
-      response = await axiosClient.post("/api/profile", formData);
-    }else {
-      response = await axiosClient.post(`/api/profileedit/${profil.idprofiluser}`, formData);
-    }
+    
+    const response = await axiosClient.post("/api/profile", dataForm);
+   
 
       console.log("Form response:", response.data);
       setStatus("Ubah Data berhasil.");
+
       
     } catch (err) {
       console.error("Ubah Data error:", err);
@@ -115,6 +142,7 @@ useEffect(() => {
       setDisabled(false);
       setTextButton("Simpan Perubahan");
       setTimeout(() => setStatus(""), 3000);
+      setTimeout(() => window.location.reload(), 3000);
     }
   };
 
@@ -156,8 +184,7 @@ useEffect(() => {
                     type="file" 
                     name="foto_profil" 
                     accept="image/*"  
-                    onChange={handleFileChange}  
-                    value={formData.foto_profil} 
+                    onChange={handleFileChange} 
                     className="hidden" />
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -187,9 +214,11 @@ useEffect(() => {
                            }
 
 
+
+
 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6 p-8">
 
-        <div className="mb-4">
+        <div className="col-span-2 md:col-span-1  mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
                   <input 
                     type="text" 
@@ -201,7 +230,7 @@ useEffect(() => {
                   />
                 </div>
 
-             <div className="mb-4">
+             <div className="col-span-2 md:col-span-1 mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <input 
                     type="email" 
@@ -212,7 +241,7 @@ useEffect(() => {
                   />
                 </div>
 
-              <div className="mb-4">
+              <div className="col-span-2 md:col-span-1   mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">No. Telepon</label>
                   <input 
                     type="tel" 
@@ -230,7 +259,7 @@ useEffect(() => {
 
 
 
-              <div className="mb-4">
+              <div className=" col-span-2 md:col-span-1  mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Provinsi</label>
                   <select 
                   name="provinsi"
@@ -248,7 +277,7 @@ useEffect(() => {
                         
                 </div>
 
-                <div className="mb-4">
+                <div className="col-span-2 md:col-span-1  mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kabupaten/Kota</label>
                   <select 
                    name="kabupaten"
@@ -265,7 +294,7 @@ useEffect(() => {
                   </select>
                 </div>
 
-         <div className="mb-4">
+         <div className="col-span-2 md:col-span-1  mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kecamatan</label>
                   <select 
                      name="kecamatan"
@@ -284,7 +313,7 @@ useEffect(() => {
 
 
 
-               <div className="mb-4">
+               <div className="col-span-2 md:col-span-1  mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kelurahan</label>
                   <select 
                      name="kelurahan"
@@ -301,7 +330,7 @@ useEffect(() => {
                   </select>
                 </div>
 
-             <div className="mb-4">
+             <div className="col-span-2 md:col-span-1  mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Kode Pos</label>
                   <input 
                     name="kode_pos"
@@ -316,7 +345,7 @@ useEffect(() => {
 
                 </div>
 
-                 <div className="mb-4">
+                 <div className="col-span-2 md:col-span-1  mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nama Anak</label>
                   <input 
                     name="nama_anak"
@@ -346,7 +375,7 @@ useEffect(() => {
                 </div>
               
                 
-                <div className="col-span-2 mb-4">
+                <div className="col-span-2 ">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Alamat</label>
                   <textarea 
                     name="alamatlengkap"
@@ -363,7 +392,7 @@ useEffect(() => {
          
 
               {/* Action Buttons */}
-              <div className="flex space-x-4 mt-2">
+              <div className="flex space-x-4 py-2">
              
                 <button
                
@@ -372,7 +401,7 @@ useEffect(() => {
                 disabled={disabled}
                   className={`${
                       disabled ? 'cursor-not-allowed opacity-50' : ''
-                     } mt-5 tracking-wide font-semibold bg-green-700 text-white w-[50%] py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none`}>                 
+                     } mt-5 tracking-wide text-sm font-semibold bg-green-700 text-white w-[50%] py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none`}>                 
                      
                      {textButton}
                 </button>

@@ -1,35 +1,55 @@
 import { useEffect, useState } from "react";
 import { getProfil } from "../lib/services/profileService";
+import { getFetchCache } from "../lib/fetchCahce/getFetchCache";
 
 export const UseGetProfil = (iduser) => {
-     const [profil, setProfil] = useState(null);
+  const [profil, setProfil] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    let isMounted = true;
+    if (!iduser) {
+      setLoading(false);
+      return;
+    }
 
-    useEffect(() => {
-         let isMounted = true;
+    const fetchProfil = async () => {
+      try {
 
-          if (!iduser) return;
-        const fetchProfil = async () => {
-            try {
-                const result = await getProfil(iduser);
-                setProfil(result.data);
-         if (isMounted) setProfil(result.data || {});
-            } catch (error) {
-            if (isMounted) setError(error?.response?.data?.message || error?.message || "Gagal memuat profil");
-            } finally {
-            if (isMounted) setLoading(false);
-            }
-        };
+        setLoading(true);
+        const result = await getFetchCache( () => getProfil(iduser), 5, 3000);
+        if (isMounted) setProfil(result.data || null);
 
-        fetchProfil();
+      } catch (error) {
 
-          return () => {
-    isMounted = false;
-  };
-}, [iduser])
+        if (isMounted) {
+          if (error?.response?.status === 404) {
+            setProfil(null);
+          } else {
+            setError(
+              error?.response?.data?.message ||
+                error?.message ||
+                "Gagal memuat profil"
+            );
+          }
+        }
 
-return { profil, loading, error};
+      } finally {
+        if (isMounted) setLoading(false);
+      }
 
+    };
+
+    const timer = setTimeout(() => {
+      fetchProfil();
+    }, 100);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [iduser]);
+
+  return { profil, loading, error };
 };

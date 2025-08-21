@@ -16,7 +16,7 @@ const GuruPrivate = () => {
         <>
 
 
-<div class="pt-8 md:py-2 sm:py-8 lg:py-12   overflow-x-hidden" id='mentor'>
+<div class="pt-8 md:py-2 sm:py-8 lg:py-28   overflow-x-hidden" id='mentor'>
   
     <div class="mx-auto px-2 md:px-8"  >
         <div className="mb-2 text-center">

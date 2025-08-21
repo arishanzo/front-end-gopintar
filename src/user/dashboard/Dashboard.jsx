@@ -23,15 +23,16 @@ const Dashboard = () => {
 
     <>
   {/* Navbar di atas */}
-  <NavbarUser />
+ 
 
   <div className="flex bg-green-10">
+
     {/* Sidebar di kiri */}
     <Sidebar />
-
+ <NavbarUser />
     {/* Main content area */}
-    <div className="flex-1 p-8 md:p-[50px] md:p-28 md:pt-32 pt-24  min-h-screen w-[80%]">
-      <h1 className="md:text-2xl text-green-900 font-bold mb-4 text-center md:text-center">Selamat Datang Di Go Pintar</h1>
+    <div className="flex-1   top-0 min-h-screen w-[80%]">
+          
     
       <GuruPrivate />
 <Category />

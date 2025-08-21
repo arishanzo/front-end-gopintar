@@ -1,27 +1,81 @@
 import { useState } from 'react';
+import axiosClient from '../../lib/axios';
+
 
 const Keamanan = () => {
-    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-    const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    
+
+    const [showcurrent_password, setShowcurrent_password] = useState(false);
+    const [showpassword, setShowpassword] = useState(false);
+    const [showpassword_confirmation, setShowpassword_confirmation] = useState(false);
+
+    
+  const [errors, setErrors] = useState({});
+  const [status, setStatus] = useState("");
+    const [disabled, setDisabled] = useState(false);
+    const [textButton, setTextButton] = useState("Ubah Password");
+
+
     const [formData, setFormData] = useState({
         current_password: '',
-        new_password: '',
-        confirm_password: ''
+        password: '',
+        password_confirmation: ''
     });
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit =  async (e) => {
+
+
         e.preventDefault();
-        console.log('Password change data:', formData);
+        
+         setDisabled(true);
+         setTextButton("Prosess");
+        setErrors({}); // reset
+
+
+
+            try {
+                console.log("=== DEBUG INFO ===");
+                console.log("Sending data:", formData);
+                
+                const response = await axiosClient.put("/api/profile/ubahpassword", formData);
+                console.log("Form response:", response.data);
+                setStatus(response.data.message);
+                setFormData({ current_password: '', password: '', password_confirmation: '' });
+
+            } catch (err) {
+                
+                const data = err.response?.data || {};
+                setErrors(data.errors || {});
+                setStatus(data.message || "Ubah Password gagal.");
+
+            } finally {
+                setDisabled(false);
+                setTextButton("Ubah Password");
+                setTimeout(() => setStatus(""), 3000);
+            }
+       
     };
 
     return (
+       
+
         <div className="w-full mx-auto p-6">
+            
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Keamanan Akun</h2>
+
+            
+                   {status && 
+                 <div 
+                  role="alert"
+                 className={`text-center mb-4 ${status?.includes('berhasil') ? 'bg-green-100 rounded-lg py-5 px-6 mb-4 text-base text-green-700 mb-3 ' : 'bg-red-100 rounded-lg py-5 px-6 mb-4 text-base text-red-700 mb-3 w-50'}`}>
+                    {status}
+                 </div>              
+                   }
+
             
             <div className="bg-white rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Ubah Password</h3>
@@ -33,20 +87,22 @@ const Keamanan = () => {
                         </label>
                         <div className="relative">
                             <input
-                                type={showCurrentPassword ? "text" : "password"}
+                                type={showcurrent_password ? "text" : "password"}
                                 name="current_password"
                                 value={formData.current_password}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pr-10"
                                 placeholder="Masukkan password saat ini"
                             />
+
+                            
                             {formData.current_password && (
                                 <button
                                     type="button"
                                     className="absolute right-3 top-2 text-gray-500 hover:text-gray-700"
-                                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                    onClick={() => setShowcurrent_password(!showcurrent_password)}
                                 >
-                                    {showCurrentPassword ? (
+                                    {showcurrent_password ? (
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                             <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
@@ -60,7 +116,11 @@ const Keamanan = () => {
                                 </button>
                             )}
                         </div>
+                        
+                    {errors?.current_password?.[0] && <small style={{color: 'red'}}>{errors.current_password[0]}</small>}
+
                     </div>
+
 
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -68,20 +128,20 @@ const Keamanan = () => {
                         </label>
                         <div className="relative">
                             <input
-                                type={showNewPassword ? "text" : "password"}
-                                name="new_password"
-                                value={formData.new_password}
+                                type={showpassword ? "text" : "password"}
+                                name="password"
+                                value={formData.password}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pr-10"
                                 placeholder="Masukkan password baru"
                             />
-                            {formData.new_password && (
+                            {formData.password && (
                                 <button
                                     type="button"
                                     className="absolute right-3 top-2 text-gray-500 hover:text-gray-700"
-                                    onClick={() => setShowNewPassword(!showNewPassword)}
+                                    onClick={() => setShowpassword(!showpassword)}
                                 >
-                                    {showNewPassword ? (
+                                    {showpassword ? (
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                             <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
@@ -95,7 +155,11 @@ const Keamanan = () => {
                                 </button>
                             )}
                         </div>
+                        
+                     {errors?.password?.[0] && <small style={{color: 'red'}}>{errors.password[0]}</small>}
+
                     </div>
+
 
                     <div className="mb-6">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -103,20 +167,20 @@ const Keamanan = () => {
                         </label>
                         <div className="relative">
                             <input
-                                type={showConfirmPassword ? "text" : "password"}
-                                name="confirm_password"
-                                value={formData.confirm_password}
+                                type={showpassword_confirmation ? "text" : "password"}
+                                name="password_confirmation"
+                                value={formData.password_confirmation}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pr-10"
                                 placeholder="Konfirmasi password baru"
                             />
-                            {formData.confirm_password && (
+                            {formData.password_confirmation && (
                                 <button
                                     type="button"
                                     className="absolute right-3 top-2 text-gray-500 hover:text-gray-700"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    onClick={() => setShowpassword_confirmation(!showpassword_confirmation)}
                                 >
-                                    {showConfirmPassword ? (
+                                    {showpassword_confirmation ? (
                                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                             <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
@@ -130,14 +194,21 @@ const Keamanan = () => {
                                 </button>
                             )}
                         </div>
+                         {errors?.password_confirmation?.[0] && <small style={{color: 'red'}}>{errors.password_confirmation[0]}</small>}
+
                     </div>
+
+                    
 
                     <button
                         type="submit"
-                        className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                        Ubah Password
-                    </button>
+                      disabled={disabled}
+                    className={`${
+                        disabled ? 'cursor-not-allowed opacity-50' : ''
+                        } mt-5 tracking-wide text-sm font-semibold bg-green-700 text-white w-full py-4 rounded-lg hover:bg-green-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none`}>                 
+                        
+                     {textButton}
+                </button>
                 </form>
             </div>
         </div>

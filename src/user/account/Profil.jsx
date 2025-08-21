@@ -2,7 +2,6 @@ import NavbarUser from "../components/NavbarUser";
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
 import FormProfil from "./FormProfil";
-import Pengaturan from "./Pengaturan";
 import Keamanan from "./Keamanan";
 
 const Profil = () => {
@@ -31,11 +30,7 @@ const Profil = () => {
                className={`py-4 px-1 border-b-2 font-medium text-sm  ${activeTab === "profil" ? "border-green-500 text-green-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
                   Ubah Profil
                 </button>
-                <button 
-                 onClick={() => setActiveTab('pengaturan')}
-               className={`py-4 px-1 border-b-2 font-medium text-sm  ${activeTab === "pengaturan" ? "border-green-500 text-green-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
-                Pengaturan
-                </button>
+              
                 <button 
                  onClick={() => setActiveTab('keamanan')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm  ${activeTab === "keamanan" ? "border-green-500 text-green-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
@@ -51,7 +46,6 @@ const Profil = () => {
               {/* Form Fields */}
                
                {activeTab === 'profil' && <FormProfil />}
-               {activeTab === 'pengaturan' && <Pengaturan/>}
                {activeTab === 'keamanan' && <Keamanan />}
                 
                

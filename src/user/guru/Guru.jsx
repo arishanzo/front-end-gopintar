@@ -1,13 +1,10 @@
 
-import Card from "./Card";
-import Category from "./Category";
-import DaftarGuru from "../guru/DaftarGuru";
-import GuruPrivate from "../guru/Guruprivate";
-import { useAuth } from "../../context/AuthContext";
+import DaftarGuru from "./DaftarGuru";
+import GuruPrivate from "./Guruprivate";
 import SideNav from "../components/SideNav";
 import { useEffect, useState } from "react";
 
-const Dashboard = () => {
+const Guru = () => {
    const [load, setLoad] = useState(true);
   
     useEffect(() => {
@@ -16,15 +13,6 @@ const Dashboard = () => {
     }, []);
 
 
-  const { loading } = useAuth();
-  
-  if (loading) {
-    return (
-       <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-        </div>
-    );
-  }
   
   return (
 
@@ -47,9 +35,7 @@ const Dashboard = () => {
          // Main content area 
               <div className="w-full h-full sm:pt-20 ">
             <GuruPrivate />
-            <Category />
-            <Card />
-            <DaftarGuru />
+            <DaftarGuru/>
         </div>
 
        )}
@@ -73,4 +59,4 @@ const Dashboard = () => {
   );
 }   
 
-export default Dashboard;
+export default Guru;

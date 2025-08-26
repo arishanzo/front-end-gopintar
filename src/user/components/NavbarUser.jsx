@@ -3,9 +3,37 @@ import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { UseGetProfil } from "../../hook/useGetProfil";
 import axiosClient from "../../lib/axios";
+// import UseNotifications from "../../hook/useNotifications";
+
 
 const NavbarUser = () => {
   const { user, logout } = useAuth();
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchNotifications = async () => {
+    if (!user?.iduser) return;
+    
+    try {
+      const res = await axiosClient.get("/api/notifications");
+      const notifData = Array.isArray(res.data) ? res.data : [];
+      setNotifications(notifData);
+      setUnreadCount(notifData.filter(n => !n.read_at).length);
+    } catch (err) {
+      console.error("Error fetching notifications:", err);
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+  };
+
+  const markAsRead = async (id) => {
+    try {
+      await axiosClient.post(`/api/notifications/${id}/read`, {});
+      fetchNotifications();
+    } catch (err) {
+      console.error("Error marking as read:", err);
+    }
+  };
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [ photo, setPhoto] = useState('https://github.com/gaearon.png');
@@ -26,17 +54,22 @@ const NavbarUser = () => {
         .catch(err => console.error(err));
     }
   }, [profil]);
+
+  useEffect(() => {
+    if (user?.iduser) {
+      fetchNotifications();
+    }
+  }, [user?.iduser]);
+
+
   
-  const notifications = [
-    { id: 1, title: "Kelas Matematika dimulai dalam 30 menit", time: "2 menit lalu", unread: true },
-    { id: 2, title: "Pembayaran berhasil dikonfirmasi", time: "1 jam lalu", unread: true },
-    { id: 3, title: "Guru baru tersedia untuk Fisika", time: "3 jam lalu", unread: false }
-  ];
+  
+ 
 
   return (
     <>
-      <nav className="fixed flex-1 top-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200 md:left-48   left-0">
-        <div className="max-w-6xl mx-auto px-4 sm:px-2 lg:px-8">
+      <nav className="fixed flex-1 top-0 right-0 z-40 bg-white/80 backdrop-blur-md  md:left-48   left-0">
+        <div className="mx-auto w-full max-w-6xl mx-auto px-4 sm:px-2 lg:px-8">
           <div className="flex justify-between items-center h-16">
             
             {/* Left side - Profile */}
@@ -158,30 +191,51 @@ const NavbarUser = () => {
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white">
+                      {unreadCount || ''}
+                    </span>
+                  )}
+                 
+                   
                 </button>
 
+ 
                 {/* Notifications Dropdown */}
                 {showNotifications && (
                   <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                     <div className="p-4">
                       <h3 className="text-lg font-medium text-gray-900 mb-3">Notifikasi</h3>
                       <div className="space-y-3">
-                        {notifications.map((notif) => (
-                          <div key={notif.id} className={`p-3 rounded-lg ${notif.unread ? 'bg-blue-50' : 'bg-gray-50'}`}>
-                            <p className="text-sm text-gray-900">{notif.title}</p>
-                            <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
+
+               {notifications.length === 0 ? (
+                          <p className="p-3 text-center text-sm text-gray-500">
+                            Tidak ada notifikasi
+                          </p>
+                        ) : (
+                        notifications.map((notif) => (
+                          <div 
+                          key={notif.id} 
+
+                          onClick={() => {
+                            markAsRead(notif.id);
+                            setShowNotifications(false);
+                          }}
+                          className={`p-3 rounded-lg hover:bg-green-100 cursor-pointer ${
+                            notif.read_at ? "text-gray-400 bg-green-50" : "bg-gray-50 text-gray-400 font-medium"
+                          }`}>
+                            <p className="text-sm text-gray-900">{notif.data?.message ?? notif.message}</p>
+                            <p className="text-xs text-gray-500 mt-1">{notif.created_at ?? notif.time}</p>
                           </div>
-                        ))}
+                        ))
+                         )}
+
                       </div>
-                      <div className="mt-4 pt-3 border-t border-gray-200">
-                        <Link to="/notifikasi" className="text-sm text-green-600 hover:text-green-500">
-                          Lihat semua notifikasi
-                        </Link>
-                      </div>
+                    
                     </div>
                   </div>
-                )}
+               
+                        )}
               </div>
             </div>
           </div>

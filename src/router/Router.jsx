@@ -7,7 +7,12 @@ import Homeindex from '../landingpage/Homeindex';
 import Dashboard from '../user/dashboard/Dashboard';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
-import Profil from '../user/account/Profil';
+import Profil from '../user/account/profil';
+import Langganan from '../user/berlangganan/Langganan';
+import FormLangganan from '../user/berlangganan/FormLangganan';
+import Checkout from '../user/berlangganan/Checkout';
+import Guru from '../user/guru/Guru';
+import BuatKelas from '../user/kelas/BuatKelas';
 
 
 
@@ -27,6 +32,19 @@ const Routeer = () => {
   {/* Hanya untuk user yang sudah login */}
   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
   <Route path="/profil" element={<ProtectedRoute><Profil /></ProtectedRoute>}/>
+  
+  <Route path="/berlangganan" element={<ProtectedRoute><Langganan /></ProtectedRoute>}/>
+  <Route path="/berlangganan/form" element={<ProtectedRoute><FormLangganan /></ProtectedRoute>}/>
+  <Route path="/berlangganan/form/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>}/>
+
+  
+  <Route path="/guru" element={<ProtectedRoute><Guru /></ProtectedRoute>}/>
+
+
+  
+  <Route path="/kelas/buatkelas" element={<ProtectedRoute><BuatKelas /></ProtectedRoute>}/>
+
+
 </Routes>
         
     );

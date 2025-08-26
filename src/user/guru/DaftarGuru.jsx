@@ -3,12 +3,22 @@ import { useState} from "react"
 
 import { getDataMentor } from "../../assets/data/datatentor";
 import {  useRef } from 'react';
+import { useNavigate } from "react-router-dom";
 
 const DaftarGuru = () => {
   const datamentor = getDataMentor();
 
   const scrollRef = useRef(null);
 
+
+     const Navigate = useNavigate();
+
+
+  
+      const handleSubmit = async (idguru) => {
+        localStorage.setItem('selectedGuruId', idguru);
+        Navigate('/kelas/buatkelas');
+      }
 
 
     
@@ -142,9 +152,15 @@ const DaftarGuru = () => {
                 <p className="text-green-600 mb-4">{mentor.subject || "Subject Expert"}</p>
               </div>
               <div className="absolute bottom-0 left-0 right-0 bg-white p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out shadow-lg rounded-t-lg">
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-gray-700 mb-3">
                   {mentor.text || "Experienced mentor with years of teaching expertise."}
                 </p>
+               <button 
+                type="button"
+                onClick={() => handleSubmit(mentor?.id || '')}
+                className="w-full bg-green-600 hover:bg-green-700 text-white text-xs py-2 px-3 rounded-lg transition-colors duration-200">
+                  Pilih Guru
+                </button>
               </div>
             </div>
           </div>

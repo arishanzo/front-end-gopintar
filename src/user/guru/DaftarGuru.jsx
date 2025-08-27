@@ -1,84 +1,56 @@
 
 import { useState} from "react"
 
-import { getDataMentor } from "../../assets/data/datatentor";
+import { getDataMentor } from "../../lib/data/getDataMentor";
 import {  useRef } from 'react';
 import { useNavigate } from "react-router-dom";
+import { getDataCategoryBelajar } from "../../lib/data/getDataCategoryBelajar";
 
-const DaftarGuru = () => {
+const DaftarGuru = ({result}) => {
+
   const datamentor = getDataMentor();
-
   const scrollRef = useRef(null);
+  const Navigate = useNavigate();
+
+  const [showModal, setShowModal] = useState(false);
 
 
-     const Navigate = useNavigate();
-
-
+     const handleRedirectToPembayaran = () => {
+        setShowModal(false);
+        Navigate('/berlangganan');
+    };
   
-      const handleSubmit = async (idguru) => {
-        localStorage.setItem('selectedGuruId', idguru);
+     const handleRedirectToGuru = () => {
+        setShowModal(false);
         Navigate('/kelas/buatkelas');
+    };
+  
+    const handleSubmit = async (idguru) => {
+        const selectedGuruId = localStorage.getItem('selectedGuruId');
+
+        if(result.statuspembayaran === 'pending' || result.statuspembayaran === 'expire' || !result ){
+          
+          setShowModal(true);
+        }else if (selectedGuruId) {
+           setShowModal(true);
+        }else{
+         localStorage.setItem('selectedGuruId', idguru);
+        Navigate('/kelas/buatkelas');
+        }
       }
 
 
-    
-  const data = [
-    { id: 1, 
-      judul: 'Matematika', 
-      icon: 'http://svgrepo.com/show/362863/math-operations-bold.svg' 
-    },
+      const data = getDataCategoryBelajar();
 
 
-     { id: 2, 
-      judul: 'Mapel Sains / IPA', 
-      icon: 'https://www.svgrepo.com/show/455758/laboratory-test-tube.svg' 
-    },
-   
-     { id: 3, 
-      judul: 'Mapel IPS', 
-      icon: 'https://www.svgrepo.com/show/454211/history-log-manuscript.svg' 
-    },
+        const [selectedCategory, setSelectedCategory] = useState('All');
+        
+        const handleCategoryClick = (category) => {
+          setSelectedCategory(category);
+        };
 
-     
-     { id: 4, 
-      judul: 'Bahasa Inggris', 
-      icon: 'https://www.svgrepo.com/show/535472/language.svg' 
-    },
-
-       { id: 5, 
-      judul: 'Bahasa Indonesia', 
-      icon: 'https://www.svgrepo.com/show/403413/flag-for-indonesia.svg' 
-    },
-
-       { id: 6, 
-      judul: 'Mapel Umum', 
-      icon: 'https://www.svgrepo.com/show/502515/bar-chart.svg' 
-    },
-
-       { id: 7, 
-      judul: 'Persiapan UTBK', 
-      icon: 'https://www.svgrepo.com/show/282517/studying-exam.svg' 
-    },
-
-       { id: 8, 
-      judul: 'Persiapan Ujian Nasional', 
-      icon: 'https://www.svgrepo.com/show/282517/studying-exam.svg' 
-    },
-
-
-]
-
-
-  const [selectedCategory, setSelectedCategory] = useState('All');
-   
-
-
-    const handleCategoryClick = (category) => {
-    setSelectedCategory(category);
-  };
-
-  const filteredGallery = selectedCategory === 'All' ? datamentor : datamentor.filter(item => item.category === selectedCategory);
-    
+        const filteredGallery = selectedCategory === 'All' ? datamentor : datamentor.filter(item => item.category === selectedCategory);
+          
 
     return (
 
@@ -171,6 +143,53 @@ const DaftarGuru = () => {
         
       </div>
     </div>
+
+
+     {/* Modal Popup */}
+            {showModal && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                    onClick={() => setShowModal(false)}
+                >
+                    <div 
+                        className="bg-white rounded-lg p-6 max-w-sm mx-4"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="text-center">
+                            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                                <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                            </div>
+                            { result.statuspembayaran === 'pending' || result.statuspembayaran === 'expire' || !result  ? (
+                              <>
+                              <h3 className="text-lg font-medium text-gray-900 mb-2">Maaf Anda Belum Berlangganan</h3>
+                                <p className="text-sm text-gray-500 mb-4">Anda Belum Berlangganan Mohon Langganan Terlebih Dahulu</p>
+                                  <button
+                                onClick={handleRedirectToPembayaran}
+                                className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                            >
+                              Langganan Sekarang
+                            </button>
+                          </>
+                            ) :(
+                              <>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Guru Sudah Dipilih</h3>
+                            <p className="text-sm text-gray-500 mb-4">Anda Sudah Memilih Guru Sebelumnya Silahkan Cek Kelas Anda</p>
+                              <button
+                                onClick={handleRedirectToGuru}
+                                className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+                            >
+                                Cek Daftar Kelas
+                            </button>
+                          </>
+                            ) }
+                          
+                        </div>
+                    </div>
+                </div>
+            )}
+
 
 
 </div>

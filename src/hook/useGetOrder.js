@@ -20,7 +20,6 @@ export const UseGetOrder = (iduser) => {
     
             setLoading(true);
             const resultget = await getFetchCache( () => getOrder(iduser), 5, 3000);
-            console.log('getFetchCache result:', resultget);
             if (isMounted) setResult(resultget || null);
     
           } catch (error) {
@@ -57,48 +56,5 @@ export const UseGetOrder = (iduser) => {
 
 
 
-    // console.log('UseGetOrder - iduser:', iduser, 'loading:', loading, 'result:', result);
-
-    // useEffect(() => {
-    //     console.log('UseGetOrder useEffect - iduser:', iduser);
-        
-    //     if (!iduser) {
-    //         console.log('No iduser, setting loading false');
-    //         setLoading(false);
-    //         setResult(null);
-    //         return;
-    //     }
-
-    //     const fetchData = async () => {
-    //         try {
-    //             setLoading(true);
-    //             const res = await axiosClient.get(`/api/midtrans/${iduser}`);
-                
-    //             console.log('API Response:', res.data);
-
-    //             let status =
-    //                 res.data?.statuspembayaran ||
-    //                 res.data?.status ||
-    //                 res.data?.transaction_status ||
-    //                 null;
-
-    //             const finalResult = {
-    //                 ...res.data,
-    //                 statuspembayaran: status,
-    //             };
-                
-    //             setResult(finalResult);
-    //         } catch (err) {
-    //             console.error("Error fetch midtrans:", err);
-    //             setResult(null);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-
-    //     fetchData();
-    // }, [iduser]);
-
-    // return { result, loading };
 }
 

@@ -5,7 +5,6 @@ import { useAuth } from "../../context/AuthContext";
 import { getDataBank } from "../../lib/data/getDataBank";
 import { getDataPayment } from "../../lib/data/getDataPayment";
 import axiosClient from "../../lib/axios";
-import DetailTransaksi from "./DetailTransaksi";
 import { useNavigate } from "react-router-dom";
 
 const FormLangganan = () => {
@@ -128,21 +127,7 @@ const FormLangganan = () => {
                 
         <section class="bg-gray-50  px-6 w-full">
           
-          <div className="mb-8 ">
-        <nav aria-label="breadcrumb ">
-          <ol class="flex space-x-2 text-sm md:text-md text-gray-600">
-            <li>
-              <a href="/berlangganan" class="hover:text-green-500 text-gray-500 font-semibold"> Lihat Struk Pembayaran</a>
-            </li>
-            <li class="text-gray-400 ">/</li>
-            <li class=" hover:text-green-500 text-green-700 font-semibold">
-              Form Langganan
-            </li>
-         
-          </ol>
-        </nav>
 
-        </div>
 
  {status && 
                                 <div 

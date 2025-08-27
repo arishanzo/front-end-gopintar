@@ -7,7 +7,7 @@ const axiosClient = axios.create({
   headers: {
     "X-Requested-With": "XMLHttpRequest", // penting untuk Sanctum
     "Accept": "application/json",
-    "Content-Type": "multipart/form-data",
+    // "Content-Type": "multipart/form-data",
   },
 });
 
@@ -19,6 +19,8 @@ axiosClient.interceptors.request.use((config) => {
   } else {
     config.headers['Content-Type'] = 'application/json';
   }
+
+   config.withCredentials = true; 
   return config;
 });
 

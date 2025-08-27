@@ -1,19 +1,11 @@
 
 
 import { useNavigate } from "react-router-dom";
-import { getDataMentor } from "../../assets/data/datatentor";
+import { getDataMentor } from "../../lib/data/getDataMentor";
 import {  useRef, useState } from 'react';
-import { UseGetOrder } from "../../hook/useGetOrder";
-import { useAuth } from "../../context/AuthContext";
 
-const GuruPrivate = () => {
+const GuruPrivate = ( { result }) => {
 
-  
-      const { user } = useAuth(); 
-  
-      const { result} = UseGetOrder(user?.iduser);
-      const { cek , setCek} = useState('');
-      setCek(result?.statuspembayaran)
 
   const scrollRef = useRef(null);
   const datamentor = getDataMentor();
@@ -36,10 +28,9 @@ const GuruPrivate = () => {
       const handleSubmit = async (idguru) => {
         const selectedGuruId = localStorage.getItem('selectedGuruId');
 
-        if(!cek === 'settlement' ){
+        if(result.statuspembayaran === 'pending' || result.statuspembayaran === 'expire' || !result ){
           
           setShowModal(true);
-            Navigate('/berlangganan');
         }else if (selectedGuruId) {
            setShowModal(true);
         }else{
@@ -71,7 +62,7 @@ const GuruPrivate = () => {
     <div className="">
       <div 
         ref={scrollRef}
-        className="flex gap-8 pt-8 overflow-x-auto scrollbar-hide cursor-grab scroll-smooth focus:outline-none"
+        className="flex gap-8 pt-2 overflow-x-auto scrollbar-hide cursor-grab scroll-smooth focus:outline-none"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         tabIndex={0}
       >
@@ -125,7 +116,7 @@ const GuruPrivate = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                                 </svg>
                             </div>
-                            {!result.statuspembayaran === 'settlement' ? (
+                            { result.statuspembayaran === 'pending' || result.statuspembayaran === 'expire' || !result  ? (
                               <>
                               <h3 className="text-lg font-medium text-gray-900 mb-2">Maaf Anda Belum Berlangganan</h3>
                                 <p className="text-sm text-gray-500 mb-4">Anda Belum Berlangganan Mohon Langganan Terlebih Dahulu</p>
@@ -133,7 +124,7 @@ const GuruPrivate = () => {
                                 onClick={handleRedirectToPembayaran}
                                 className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
                             >
-                              Langganan Sekarang  Cek Daftar Kelas
+                              Langganan Sekarang
                             </button>
                           </>
                             ) :(

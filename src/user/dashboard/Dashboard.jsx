@@ -1,31 +1,17 @@
 
-import Card from "./Card";
 import Category from "./Category";
 import DaftarGuru from "../guru/DaftarGuru";
-import GuruPrivate from "../guru/Guruprivate";
+import GuruPrivate from "../guru/GuruPrivate";
 import { useAuth } from "../../context/AuthContext";
 import SideNav from "../components/SideNav";
-import { useEffect, useState } from "react";
+import { UseGetOrder } from "../../hook/useGetOrder";
 
 const Dashboard = () => {
-   const [load, setLoad] = useState(true);
-  
-    useEffect(() => {
-      const timer = setTimeout(() => setLoad(false), 2000);
-      return () => clearTimeout(timer);
-    }, []);
+    const { user } = useAuth();
+     const { result, loading  } = UseGetOrder(user?.iduser);
 
+  
 
-  const { loading } = useAuth();
-  
-  if (loading) {
-    return (
-       <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-        </div>
-    );
-  }
-  
   return (
 
     <>
@@ -36,7 +22,7 @@ const Dashboard = () => {
     {/* Main content area */}
     <div className="flex-1   top-0 min-h-screen w-[80%]">
           
-     {load ? (
+     {loading ? (
 
        <div className="min-h-screen flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
@@ -45,11 +31,10 @@ const Dashboard = () => {
        ) : (
 
          // Main content area 
-              <div className="w-full h-full sm:pt-20 ">
-            <GuruPrivate />
+              <div className="w-full h-full py-16 p-4 sm:pt-20 ">
+            <GuruPrivate result={result} />
             <Category />
-            <Card />
-            <DaftarGuru />
+            <DaftarGuru  result={result}/>
         </div>
 
        )}

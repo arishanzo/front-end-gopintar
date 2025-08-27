@@ -11,6 +11,8 @@ const NavbarUser = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  console.log(notifications);
+
   const fetchNotifications = async () => {
     if (!user?.iduser) return;
     
@@ -34,6 +36,16 @@ const NavbarUser = () => {
       console.error("Error marking as read:", err);
     }
   };
+
+   const markAsDelete = async (iduser) => {
+    try {
+      await axiosClient.post(`/api/notifications/${iduser}/clear`, {});
+      fetchNotifications();
+    } catch (err) {
+      console.error("Error marking as read:", err);
+    }
+  };
+
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [ photo, setPhoto] = useState('https://github.com/gaearon.png');
@@ -44,6 +56,7 @@ const NavbarUser = () => {
     
   
   useEffect(() => {
+     fetchNotifications();
     if (profil?.foto_profil) {
       axiosClient
         .get(`/api/photos/${encodeURIComponent(profil.foto_profil)}`, { responseType: 'blob' })
@@ -53,13 +66,15 @@ const NavbarUser = () => {
         })
         .catch(err => console.error(err));
     }
+
+    
   }, [profil]);
 
-  useEffect(() => {
-    if (user?.iduser) {
-      fetchNotifications();
-    }
-  }, [user?.iduser]);
+  // useEffect(() => {
+   
+     
+    
+  // }, []);
 
 
   
@@ -192,7 +207,7 @@ const NavbarUser = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
                   {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white">
+                    <span className="absolute top-0 right-0 block h-4 w-4 text-white rounded-full bg-red-400 text-xs ring-2 ring-white">
                       {unreadCount || ''}
                     </span>
                   )}
@@ -230,7 +245,14 @@ const NavbarUser = () => {
                         ))
                          )}
 
+                   <div className="p-4 border-t border-gray-200 space-y-2">
+                          <button onClick={() =>  markAsDelete(user?.iduser)} className="mt-4 w-full inline-flex justify-start bg-white text-base font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm text-start">
+                        Clear All
+                      </button>
+                    </div>
                       </div>
+
+                     
                     
                     </div>
                   </div>

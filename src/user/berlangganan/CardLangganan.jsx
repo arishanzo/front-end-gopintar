@@ -7,19 +7,7 @@ const CardLangganan = () => {
     return (
         <div className=" md:pt-24 pt-16  ">
       
-            <div className="mb-8">
-                <nav aria-label="breadcrumb">
-                    <ol className="flex space-x-2 text-sm md:text-md text-gray-600">
-                        <li>
-                            <a href="/berlangganan" className="hover:text-green-500 text-green-700 font-semibold">Langganan</a>
-                        </li>
-                        <li className="text-gray-400">/</li>
-                        <li className="text-gray-400">Form Langganan</li>
-                        <li className="text-gray-400 font-semibold">/</li>
-                        <li className="text-gray-400">Form Checkout</li>
-                    </ol>
-                </nav>
-            </div>
+         
 
             <div className='border-t border-gray-200 py-4'>
                 <h2 className="text-2xl font-bold text-center sm:text-4xl">Paket Berlangganan</h2>

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { getDataMentor } from "../../assets/data/datatentor";
 import { useNavigate } from "react-router-dom";
-import FormBooking from "./form/FormBooking";
 import ProfilGuru from "./form/ProfilGuru";
 import ReviewForm from "./form/ReviewForm";
+import AturJadwalForm from "./form/AturJadwalForm";
+import KalenderJadwal from "./form/KalenderJadwal";
 
 
 const FormKelas = () => {
@@ -14,12 +15,23 @@ const FormKelas = () => {
 
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
-        const [formData, setFormData] = useState({
+    
+    const [formData, setFormData] = useState({
         name: datamentor.Name,
         street: "",
         city: "",
         postal: ""
-        });
+     });
+
+    const [formTglDataBooking, setFormTglDataBooking] = useState({
+      
+      idguru : '',
+      tglbooking : '',
+      sesi: '',
+      statusngajar: 'Belum Mulai',
+    })
+
+    console.log(formTglDataBooking);
 
 
         const steps = ["Profil Guru Private", "Address", "Review & Submit"];
@@ -34,6 +46,7 @@ const FormKelas = () => {
         const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+        
         };
 
 
@@ -49,42 +62,29 @@ const FormKelas = () => {
 
     return (
         <>
-           <div className=" flex  justify-between bg-gray-50">
-      <div className="w-full max-w-6xl bg-white shadow-lg rounded-lg p-8">
 
-        {/* Step Indicators */}
-        <div className="flex items-center justify-between mb-8 w-full max-w-6xl">
-          {steps.map((_, i) => (
-            <div key={i} className="relative flex-1 flex items-center">
-              <div
-                className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors duration-300 z-10 ${
-                  i <= currentStep
-                    ? "bg-green-600 text-white"
-                    : "bg-gray-300 text-gray-600"
-                }`}
-              >
-                {i + 1}
-              </div>
-             
-            </div>
-          ))}
-        </div>
+        {/* Step Forms */}
+        <form>
+          {currentStep === 0 && (<ProfilGuru datamentor={datamentor}/>)}
+{/* 
+          {currentStep === 1 && (  <AturJadwalForm formData={formData} handleChange={handleChange} />)} */}
+          {currentStep === 1 && (<KalenderJadwal  setFormTglDataBooking={setFormTglDataBooking} />)}
+          {currentStep === 2 && (<ReviewForm formData={formData} />  )}
+
+
+           <div className="w-full max-w-6xl bg-white shadow-md rounded-xl p-8">
+
+   
 
         {/* Progress Bar */}
-        <div className="w-full max-w-6xl bg-gray-200 rounded-full h-2 mb-8">
+        <div className="w-full max-w-6xl bg-green-100 rounded-full h-2 ">
           <div
             className="bg-green-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
           ></div>
         </div>
 
-        {/* Step Forms */}
-        <form>
-          {currentStep === 0 && (<ProfilGuru datamentor={datamentor}/>)}
-
-          {currentStep === 1 && (  <FormBooking formData={formData} handleChange={handleChange} />)}
-
-          {currentStep === 2 && (<ReviewForm formData={formData} />  )}
+           </div>
 
           {/* Navigation */}
           <div className="flex justify-between mt-8">
@@ -118,8 +118,7 @@ const FormKelas = () => {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+   
         </>
     )
 }

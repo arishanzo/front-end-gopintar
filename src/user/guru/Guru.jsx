@@ -33,7 +33,7 @@ const Guru = () => {
        ) : (
 
          // Main content area 
-              <div className="w-full h-full sm:pt-20 ">
+                  <div className="w-full h-full py-16 p-4 sm:pt-20 ">
             <GuruPrivate result={result} />
             <DaftarGuru  result={result}/>
         </div>

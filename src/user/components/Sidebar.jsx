@@ -91,10 +91,10 @@ const Sidebar = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {!isCollapsed && (
-          <Link to="/dashboard" className="flex items-center space-x-2">
+          <a href="/dashboard" className="flex items-center space-x-2">
             <img className="w-16 h-16" src="../img/logo/logogopintar.png" alt="Go-Pintar" />
             <span className="text-lg font-bold text-green-600">Go-Pintar</span>
-          </Link>
+          </a>
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -111,9 +111,9 @@ const Sidebar = () => {
       {/* Main Menu */}
       <nav className="flex-1 p-4 space-y-2">
         {menuItems.map((item) => (
-          <Link
+          <a
             key={item.path}
-            to={item.path}
+            href={item.path}
             className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative ${
               isActive(item.path, item.activePaths)
                 ? 'bg-green-100 text-green-700 shadow-sm'
@@ -138,14 +138,14 @@ const Sidebar = () => {
                 {item.notification}
               </span>
             )}
-          </Link>
+          </a>
         ))}
 
         
       <div className="p-4 border-t border-gray-200 space-y-2">
          {/* Profile Link */}
-        <Link
-          to="/profil"
+        <a
+          href="/profil"
           className={`flex items-start space-x-3  py-2.5 rounded-lg transition-all duration-200 group ${
             isActive('/profil')
               ? 'bg-green-100 text-green-700 shadow-sm'
@@ -158,7 +158,7 @@ const Sidebar = () => {
             </svg>
           </div>
           {!isCollapsed && <span className="font-medium">Profil</span>}
-        </Link>
+        </a>
       </div>
       </nav>
 

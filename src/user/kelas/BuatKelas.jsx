@@ -41,7 +41,7 @@ const BuatKelas = () => {
                          <div className="w-full h-full  flex items-center justify-start md:px-12 px-2  md:pt-8 ">
 
                 
-                    <section className="bg-gray-50  px-6 w-full">
+                    <section className="  px-6 w-full">
                               <FormKelas />
                         </section>
 

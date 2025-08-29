@@ -11,7 +11,6 @@ const NavbarUser = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  console.log(notifications);
 
   const fetchNotifications = async () => {
     if (!user?.iduser) return;

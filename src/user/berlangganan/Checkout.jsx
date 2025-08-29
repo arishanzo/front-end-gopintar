@@ -292,14 +292,14 @@ const Checkout = () => {
                         )}
 
                         {/* Indomaret */}
-                        {result?.metodepembayaran === "cstore_indomaret" && (
+                        {result?.metodepembayaran === "cstore" && (
                             <div className="space-y-4">
                                 <h3 className="font-semibold text-lg text-gray-800">Cara Pembayaran di Indomaret:</h3>
                                 <div className="bg-red-50 p-4 rounded-lg">
                                     <p className="font-semibold text-red-800">Kode Pembayaran: {result?.payment_code || '-'}</p>
                                 </div>
                                 <ol className="list-decimal list-inside space-y-2 text-gray-700">
-                                    <li>Datang ke Indomaret terdekat</li>
+                                    <li>Datang ke {result?.store.toUpperCase() || ''} terdekat</li>
                                     <li>Berikan kode pembayaran di atas ke kasir</li>
                                     <li>Kasir akan memproses pembayaran</li>
                                     <li>Bayar sesuai nominal yang tertera</li>
@@ -313,27 +313,7 @@ const Checkout = () => {
                             </div>
                         )}
 
-                        {/* Alfamart */}
-                        {result?.metodepembayaran === "cstore_alfamart" && (
-                            <div className="space-y-4">
-                                <h3 className="font-semibold text-lg text-gray-800">Cara Pembayaran di Alfamart:</h3>
-                                <div className="bg-blue-50 p-4 rounded-lg">
-                                    <p className="font-semibold text-blue-800">Kode Pembayaran: {result?.payment_code || '-'}</p>
-                                </div>
-                                <ol className="list-decimal list-inside space-y-2 text-gray-700">
-                                    <li>Datang ke Alfamart terdekat</li>
-                                    <li>Berikan kode pembayaran di atas ke kasir</li>
-                                    <li>Kasir akan memproses pembayaran</li>
-                                    <li>Bayar sesuai nominal yang tertera</li>
-                                    <li>Simpan struk sebagai bukti pembayaran</li>
-                                </ol>
-                                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                        <p className="text-sm text-yellow-800">
-                                            <strong>Penting:</strong> Pastikan nominal yang dibayar sesuai dengan tagihan
-                                        </p>
-                                    </div>
-                            </div>
-                        )}
+                      
 
                           <button
                            onClick={() => navigate('/berlangganan/form')}
